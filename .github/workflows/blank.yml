@@ -1,0 +1,44 @@
+name: بث مباشر RTMP دائم
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  live-stream:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: تثبيت FFmpeg والخطوط
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-dejavu
+
+      - name: بدء البث المستمر
+        run: |
+          INPUT="https://ab.footballii.ir/hls2/bein1_src.m3u8"
+          OUTPUT="rtmp://vsu.okcdn.ru/input/10237855538790_8860754578022_h5fia4qh44"
+
+          while true; do
+            echo "==============================="
+            echo "بدء محاولة بث جديدة في $(date -u)"
+            echo "==============================="
+
+            ffmpeg -re \
+              -user_agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" \
+              -fflags +genpts -rtbufsize 100M -timeout 5000000 \
+              -reconnect 1 -reconnect_at_eof 1 -reconnect_streamed 1 -reconnect_delay_max 5 \
+              -i "$INPUT" \
+              -vf "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='7esentv.com':fontcolor=white@0.6:fontsize=26:borderw=0:x=15:y=main_h-50" \
+              -c:v libx264 -preset veryfast -b:v 3000k \
+              -c:a aac -b:a 128k -ar 44100 \
+              -f flv "$OUTPUT" \
+              -loglevel error \
+              -hide_banner \
+              -stats
+
+            echo "حدث خطأ أو انتهى البث، إعادة المحاولة بعد 10 ثواني..."
+            sleep 10
+          done
