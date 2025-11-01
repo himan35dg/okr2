@@ -19,7 +19,7 @@ jobs:
       - name: بدء البث المستمر
         run: |
           INPUT="http://ugeen.live:8080/live/Ugeen_VIPdHi95o/eoKGvj/459.ts"
-          OUTPUT="rtmp://vsu.okcdn.ru/input/10237855538790_8860754578022_h5fia4qh44"
+          OUTPUT="rtmp://vsu.okcdn.ru/input/10380930129510_9050461506150_z22okuxcwu"
 
           while true; do
             echo "==============================="
