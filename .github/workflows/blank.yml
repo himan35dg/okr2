@@ -18,7 +18,7 @@ jobs:
 
       - name: بدء البث المستمر
         run: |
-          INPUT="https://7esenlink.vercel.app/api/stream/fhd1/2"
+          INPUT="http://ugeen.live:8080/Ugeen_VIPhHGiiG/SZF8pQ/3221"
           OUTPUT="rtmp://vsu.okcdn.ru/input/10380930129510_9050461506150_z22okuxcwu"
 
           while true; do
