@@ -1,4 +1,4 @@
-name: بث مباشر RTMP دائم
+name: بث مباشر RTMP دائم 1080p60
 
 on:
   workflow_dispatch:
@@ -18,8 +18,8 @@ jobs:
 
       - name: بدء البث المستمر
         run: |
-          INPUT="http://ugeen.live:8080/Ugeen_VIPhHGiiG/SZF8pQ/3222"
-          OUTPUT="rtmp://vsu.okcdn.ru/input/10380930129510_9050461506150_z22okuxcwu"
+          INPUT="http://ugeen.live:8080/Ugeen_VIPhHGiiG/SZF8pQ/3222.ts"
+          OUTPUT="rtmp://vsu.okcdn.ru/input/9585026080287_8946523310623_kilm7b4gee"
 
           while true; do
             echo "==============================="
@@ -31,8 +31,8 @@ jobs:
               -fflags +genpts -rtbufsize 100M -timeout 5000000 \
               -reconnect 1 -reconnect_at_eof 1 -reconnect_streamed 1 -reconnect_delay_max 5 \
               -i "$INPUT" \
-              -vf "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='7esentv.com':fontcolor=white@0.6:fontsize=26:borderw=0:x=15:y=main_h-50" \
-              -c:v libx264 -preset veryfast -b:v 3000k \
+              -vf "scale=1920:1080,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='7esentv.com':fontcolor=white@0.6:fontsize=26:borderw=0:x=15:y=main_h-50" \
+              -c:v libx264 -preset veryfast -b:v 6000k -r 60 \
               -c:a aac -b:a 128k -ar 44100 \
               -f flv "$OUTPUT" \
               -loglevel error \
