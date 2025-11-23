@@ -1,4 +1,4 @@
-name: بث مباشر RTMP دائم 1080p60
+name: بث مباشر RTMP دائم 1080p60 HQ
 
 on:
   workflow_dispatch:
@@ -16,29 +16,38 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg fonts-dejavu
 
-      - name: بدء البث المستمر
+      - name: بدء البث المستمر بجودة عالية
         run: |
-          INPUT="http://ugeen.live:8080/Ugeen_VIPhHGiiG/SZF8pQ/3222"
+          # إعداد المتغيرات
+          INPUT="http://ugeen.live:8080/Ugeen_VIPhHGiiG/SZF8pQ/450"
           OUTPUT="rtmp://vsu.okcdn.ru/input/10380930129510_9050461506150_z22okuxcwu"
-
+          
+          # إعدادات الجودة
+          # تم اختيار preset veryfast لأن سيرفرات جيثب قد لا تتحمل medium مع 60 فريم
+          # ولكن تم تعويض ذلك برفع البت ريت
+          
           while true; do
             echo "==============================="
-            echo "بدء محاولة بث جديدة في $(date -u)"
+            echo "بدء محاولة بث فائقة الجودة في $(date -u)"
             echo "==============================="
 
             ffmpeg -re \
               -user_agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" \
-              -fflags +genpts -rtbufsize 100M -timeout 5000000 \
+              -thread_queue_size 1024 \
+              -fflags +genpts -rtbufsize 200M -timeout 10000000 \
               -reconnect 1 -reconnect_at_eof 1 -reconnect_streamed 1 -reconnect_delay_max 5 \
               -i "$INPUT" \
-              -vf "scale=1920:1080,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='7esentv.com':fontcolor=white@0.6:fontsize=26:borderw=0:x=15:y=main_h-50" \
-              -c:v libx264 -preset veryfast -b:v 6000k -r 60 \
-              -c:a aac -b:a 128k -ar 44100 \
+              -vf "scale=1920:1080:flags=lanczos,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='7esentv.com':fontcolor=white@0.8:fontsize=30:borderw=1:bordercolor=black:x=20:y=main_h-60" \
+              -c:v libx264 -preset veryfast -profile:v high -level:v 4.2 \
+              -b:v 8500k -maxrate 8500k -bufsize 17000k \
+              -g 120 -keyint_min 120 \
+              -r 60 \
+              -c:a aac -b:a 192k -ar 48000 -ac 2 \
               -f flv "$OUTPUT" \
               -loglevel error \
               -hide_banner \
               -stats
 
-            echo "حدث خطأ أو انتهى البث، إعادة المحاولة بعد 10 ثواني..."
-            sleep 10
+            echo "حدث خطأ أو انقطع الاتصال، إعادة المحاولة بعد 5 ثواني..."
+            sleep 5
           done
