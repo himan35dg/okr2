@@ -1,4 +1,4 @@
-name: بث مباشر بروكسي السعودية 1080p
+name: بث مباشر خداع السيرفر
 
 on:
   workflow_dispatch:
@@ -11,43 +11,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: تثبيت FFmpeg والخطوط
+      - name: تثبيت FFmpeg
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg fonts-dejavu
 
-      - name: بدء البث عبر البروكسي
+      - name: بدء البث (محاكاة متصفح)
         run: |
-          # المتغيرات
           INPUT="http://ehson.in:2082/live/fdh300/tjry/33584.m3u8"
           OUTPUT="rtmp://vsu.okcdn.ru/input/10380930129510_9050461506150_z22okuxcwu"
-          
-          # تم اختيار هذا البروكسي من القائمة التي أرسلتها
-          PROXY_URL="http://46.152.153.247:8080"
 
           while true; do
             echo "==============================="
-            echo "بدء البث باستخدام البروكسي $PROXY_URL في $(date -u)"
+            echo "بدء البث بمحاكاة متصفح في $(date -u)"
             echo "==============================="
 
             ffmpeg -re \
-              -http_proxy "$PROXY_URL" \
-              -user_agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+              -user_agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" \
+              -headers "Referer: http://ehson.in:2082/" \
+              -headers "Origin: http://ehson.in:2082" \
               -thread_queue_size 1024 \
-              -fflags +genpts -rtbufsize 100M -timeout 20000000 \
+              -fflags +genpts -rtbufsize 100M -timeout 10000000 \
               -reconnect 1 -reconnect_at_eof 1 -reconnect_streamed 1 -reconnect_delay_max 5 \
               -i "$INPUT" \
               -vf "scale=1920:1080:flags=lanczos,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='7esentv.com':fontcolor=white@0.8:fontsize=30:borderw=1:bordercolor=black:x=20:y=main_h-60" \
-              -c:v libx264 -preset ultrafast -profile:v high -level:v 4.1 \
+              -c:v libx264 -preset veryfast -profile:v high -level:v 4.1 \
               -b:v 4500k -maxrate 5000k -bufsize 10000k \
               -g 60 -keyint_min 60 \
               -r 30 \
               -c:a aac -b:a 128k -ar 44100 -ac 2 \
               -f flv "$OUTPUT" \
-              -loglevel warning \
+              -loglevel error \
               -hide_banner \
               -stats
 
-            echo "انقطع الاتصال أو فشل البروكسي، إعادة المحاولة بعد 10 ثواني..."
-            sleep 10
+            echo "إعادة المحاولة بعد 5 ثواني..."
+            sleep 5
           done
